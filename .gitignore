@@ -1,0 +1,21 @@
+# Build
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Local DB / data / logs
+*.db
+*.sqlite
+*.log
+*.csv
+
+# Secret config
+appsettings.json
+
+# Temp
+*.tmp
+*.temp

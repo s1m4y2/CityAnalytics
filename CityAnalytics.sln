@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CityAnalytics.DataIngest", "CityAnalytics.DataIngest\CityAnalytics.DataIngest.csproj", "{56951C5A-C7C8-4E8D-B016-597C80B5A356}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CityAnalytics.Analytics", "CityAnalytics.Analytics\CityAnalytics.Analytics.csproj", "{5962ED52-D9B0-4D5D-8122-282A256B4CBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CityAnalytics.Web", "CityAnalytics.Web\CityAnalytics.Web.csproj", "{2FC92E46-1A5B-40E0-8421-C5012A54FE13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CityAnalytics.Shared", "CityAnalytics.Shared\CityAnalytics.Shared.csproj", "{A48839E7-FC85-43EE-BCC2-8F6F364FE00C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CityAnalytics.Storage", "CityAnalytics.Storage\CityAnalytics.Storage.csproj", "{58118893-367D-435A-BFE0-8C43255BFCFE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		appsettings.example.json = appsettings.example.json
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{56951C5A-C7C8-4E8D-B016-597C80B5A356}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56951C5A-C7C8-4E8D-B016-597C80B5A356}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56951C5A-C7C8-4E8D-B016-597C80B5A356}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56951C5A-C7C8-4E8D-B016-597C80B5A356}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5962ED52-D9B0-4D5D-8122-282A256B4CBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5962ED52-D9B0-4D5D-8122-282A256B4CBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5962ED52-D9B0-4D5D-8122-282A256B4CBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5962ED52-D9B0-4D5D-8122-282A256B4CBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FC92E46-1A5B-40E0-8421-C5012A54FE13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FC92E46-1A5B-40E0-8421-C5012A54FE13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FC92E46-1A5B-40E0-8421-C5012A54FE13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FC92E46-1A5B-40E0-8421-C5012A54FE13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A48839E7-FC85-43EE-BCC2-8F6F364FE00C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A48839E7-FC85-43EE-BCC2-8F6F364FE00C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A48839E7-FC85-43EE-BCC2-8F6F364FE00C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A48839E7-FC85-43EE-BCC2-8F6F364FE00C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58118893-367D-435A-BFE0-8C43255BFCFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58118893-367D-435A-BFE0-8C43255BFCFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58118893-367D-435A-BFE0-8C43255BFCFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58118893-367D-435A-BFE0-8C43255BFCFE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {630B48C6-265C-4D57-815F-6A750D68B1A7}
+	EndGlobalSection
+EndGlobal

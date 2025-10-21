@@ -1,0 +1,414 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Şehir Veri Analitiği Dashboard";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<style>
+    :root {
+        --accent1: #007cf0;
+        --accent2: #00dfd8;
+    }
+
+    * {
+        transition: background 0.4s ease, color 0.4s ease, transform 0.4s ease;
+    }
+
+    body {
+        font-family: 'Poppins', 'Segoe UI', sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+        /* 🌞 LIGHT MODE */
+        body.light-mode {
+            background: linear-gradient(135deg, #eef2f3, #8e9eab);
+            color: #333;
+        }
+
+            body.light-mode .chart-card {
+                background: #fff;
+                color: #333;
+            }
+
+            body.light-mode .navbar {
+                background-color: #fff !important;
+                color: #333 !important;
+            }
+
+        /* 🌙 DARK MODE */
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f1f5f9;
+        }
+
+            body.dark-mode .chart-card {
+                background: #1e293b;
+                color: #f1f5f9;
+            }
+
+            body.dark-mode .navbar {
+                background-color: #111827 !important;
+                border-bottom: 1px solid #1f2937 !important;
+            }
+
+    .navbar a {
+        color: inherit !important;
+    }
+
+    h1 {
+        text-align: center;
+        font-weight: 600;
+        background: linear-gradient(45deg, var(--accent1), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 1px;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 30px;
+        border-radius: 20px;
+        backdrop-filter: blur(8px);
+    }
+
+    .controls {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    input, button, select {
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+        gap: 25px;
+        margin-top: 25px;
+    }
+
+    .chart-card {
+        border-radius: 15px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        transition: transform 0.3s ease;
+    }
+
+        .chart-card:hover {
+            transform: translateY(-4px);
+        }
+
+    .theme-toggle {
+        cursor: pointer;
+        font-size: 20px;
+        background: none;
+        border: none;
+        color: inherit;
+        transition: transform 0.3s ease;
+    }
+
+        .theme-toggle:hover {
+            transform: rotate(20deg);
+        }
+
+    .spinner {
+        border: 6px solid rgba(255, 255, 255, 0.2);
+        border-top: 6px solid var(--accent2);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+
+    @@keyframes spin {
+        to
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+</style>
+
+<!-- 🔹 Navbar -->
+<nav class="navbar navbar-expand-sm border-bottom box-shadow mb-3">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand fw-bold" href="/">CityAnalytics.Web</a>
+        <div class="d-flex align-items-center gap-3">
+            <ul class="navbar-nav flex-row gap-3 mb-0">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/Privacy">Privacy</a></li>
+            </ul>
+            <button id="themeToggle" class="theme-toggle" title="Tema Değiştir">🌙</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>🚇 Şehir Veri Analitiği Dashboard</h1>
+
+    <div class="controls">
+        <input id="institution" placeholder="Kurum adı (örn: Metro, Eshot, İzban)">
+        <input id="fromDate" type="date">
+        <input id="toDate" type="date">
+        <button id="btnLoad">Yükle</button>
+    </div>
+
+    <div id="loadingSpinner" style="display:none;text-align:center;">
+        <div class="spinner"></div>
+        <p>Veriler yükleniyor...</p>
+    </div>
+
+    <div id="summaryBox" style="display:none;background:linear-gradient(120deg,#89f7fe,#66a6ff);
+        color:white;border-radius:12px;padding:20px;margin-bottom:30px;font-weight:600;text-align:center;">
+        <h3>📊 Seçili Aralıkta Toplam Yolcu Sayısı</h3>
+        <p id="summaryText" style="font-size:22px;">–</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="chart-card"><h3>📅 Günlük Kullanım</h3><canvas id="dailyChart"></canvas></div>
+        <div class="chart-card"><h3>🗓️ Aylık Toplam</h3><canvas id="monthlyChart"></canvas></div>
+        <div class="chart-card"><h3>🔮 7 Günlük Tahmin</h3><canvas id="forecastChart"></canvas></div>
+        <div class="chart-card"><h3>🏆 En Yoğun 5 Kurum</h3><canvas id="topInstitutionsChart"></canvas></div>
+
+        <div class="chart-card">
+            <h3>🧠 Kurum Kümeleri</h3>
+            <button id="btnCluster" style="padding:8px;margin-bottom:10px;">Kümeleri Göster</button>
+            <canvas id="clusterChart" height="100"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <h3>🌌 3D Küme Dağılımı</h3>
+            <div style="display:flex;gap:10px;margin-bottom:10px;">
+                <button id="btnScatter3D">3D Grafiği Göster</button>
+                <select id="zMetric" style="padding:8px;">
+                    <option value="Free" selected>Free</option>
+                    <option value="BankCard">BankCard</option>
+                </select>
+            </div>
+            <div id="scatter3d" style="height:420px;"></div>
+        </div>
+
+        <div class="chart-card">
+            <h3>🔗 Korelasyon Isı Haritası</h3>
+            <div id="corrHeatmap" style="height:460px;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const btnLoad = document.getElementById("btnLoad");
+        const institution = document.getElementById("institution");
+        const fromDate = document.getElementById("fromDate");
+        const toDate = document.getElementById("toDate");
+
+        // 🌗 Tema Toggle
+        const themeToggle = document.getElementById("themeToggle");
+        const currentTheme = localStorage.getItem("theme") || "dark";
+        document.body.classList.add(`${currentTheme}-mode`);
+        themeToggle.textContent = currentTheme === "dark" ? "☀️" : "🌙";
+
+        themeToggle.addEventListener("click", () => {
+            const isDark = document.body.classList.toggle("dark-mode");
+            document.body.classList.toggle("light-mode", !isDark);
+            themeToggle.textContent = isDark ? "☀️" : "🌙";
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        });
+
+        let dailyChartObj=null, monthlyChartObj=null, forecastChartObj=null, topInstitutionsChartObj=null, clusterChartObj=null;
+
+        async function loadDashboard(inst, from, to) {
+            if(!inst){alert("Lütfen bir kurum adı girin.");return;}
+            document.getElementById("loadingSpinner").style.display="block";
+
+            const query=`institution=${encodeURIComponent(inst)}${from?`&from=${from}`:""}${to?`&to=${to}`:""}`;
+            const [daily,monthly,forecast,topData]=await Promise.all([
+                fetch(`/api/daily?${query}`).then(r=>r.json()),
+                fetch(`/api/monthly?${query}`).then(r=>r.json()),
+                fetch(`/api/forecast?institution=${inst}`).then(r=>r.json()),
+                fetch(`/api/top?${from?`from=${from}&`:""}${to?`to=${to}`:""}`).then(r=>r.json())
+            ]);
+
+            const dailyLabels=daily.map(x=>x.date.split('T')[0]);
+            const dailyData=daily.map(x=>x.total);
+            const monthlyLabels=monthly.map(x=>`Ay ${x.month}`);
+            const monthlyData=monthly.map(x=>x.total);
+            const forecastLabels=forecast.map(x=>x.date.split('T')[0]);
+            const forecastData=forecast.map(x=>x.forecast);
+            const topLabels=topData.map(x=>x.institution);
+            const topTotals=topData.map(x=>x.total);
+
+            [dailyChartObj,monthlyChartObj,forecastChartObj,topInstitutionsChartObj].forEach(c=>c?.destroy());
+
+            dailyChartObj=new Chart(document.getElementById("dailyChart"),{type:"line",data:{labels:dailyLabels,datasets:[{label:`${inst} Günlük`,data:dailyData,borderColor:"#007cf0"}]}});
+            monthlyChartObj=new Chart(document.getElementById("monthlyChart"),{type:"bar",data:{labels:monthlyLabels,datasets:[{label:`${inst} Aylık`,data:monthlyData,backgroundColor:"#00dfd8"}]}});
+            forecastChartObj=new Chart(document.getElementById("forecastChart"),{type:"line",data:{labels:forecastLabels,datasets:[{label:`${inst} Tahmin`,data:forecastData,borderColor:"#59a14f"}]}});
+            topInstitutionsChartObj=new Chart(document.getElementById("topInstitutionsChart"),{type:"bar",data:{labels:topLabels,datasets:[{label:"Top 5 Kurum",data:topTotals,backgroundColor:["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f"]}]}});
+
+            // 🔁 Tıklanınca yeni kurum için grafik güncelle
+            document.getElementById("topInstitutionsChart").onclick=function(evt){
+                const pts=topInstitutionsChartObj.getElementsAtEventForMode(evt,'nearest',{intersect:true},true);
+                if(pts.length){
+                    const lbl=topInstitutionsChartObj.data.labels[pts[0].index];
+                    institution.value=lbl;
+                    loadDashboard(lbl);
+                }
+            };
+
+            document.getElementById("summaryBox").style.display="block";
+            document.getElementById("summaryText").textContent=`${daily.reduce((s,x)=>s+x.total,0).toLocaleString("tr-TR")} yolcu (${from||"ilk"} → ${to||"son"})`;
+            document.getElementById("loadingSpinner").style.display="none";
+        }
+
+        // 🚨 Aykırı Değer (Anomaly) Gösterimi
+    async function detectAnomalies(inst) {
+        const res = await fetch(`/api/anomalies?institution=${encodeURIComponent(inst)}`);
+        const data = await res.json();
+        if (!data?.length) return;
+
+        const anomalyPoints = data.filter(d => d.isAnomaly);
+        if (!anomalyPoints.length) return;
+
+        dailyChartObj.data.datasets.push({
+            label: "Anomali Günleri",
+            data: anomalyPoints.map(a => ({ x: a.date.split('T')[0], y: a.total })),
+            pointStyle: "triangle",
+            pointRadius: 8,
+            backgroundColor: "red",
+            borderColor: "red",
+            showLine: false
+        });
+        dailyChartObj.update();
+    }
+
+    // 🔗 Korelasyon Haritası
+    async function loadCorrelation(inst, from, to) {
+        const q = `institution=${encodeURIComponent(inst)}${from?`&from=${from}`:""}${to?`&to=${to}`:""}`;
+        const res = await fetch(`/api/correlation?${q}`);
+        const data = await res.json();
+        if (!data?.matrix?.length) return;
+
+        const trace = {
+            z: data.matrix, x: data.labels, y: data.labels,
+            type: 'heatmap', colorscale: 'RdBu', reversescale: true, zmin: -1, zmax: 1,
+            colorbar: { title: 'ρ' }
+        };
+        Plotly.newPlot('corrHeatmap', [trace], { margin: { l: 80, r: 20, t: 40, b: 80 }, xaxis: { side: 'top' }, yaxis: { autorange: 'reversed' } }, {responsive:true});
+    }
+
+    // 🌌 3D Scatter
+    function render3DScatter(data, zMetric) {
+        if (!data?.length) return;
+        const colors = ["#4caf50","#ff9800","#2196f3","#9c27b0","#f44336"];
+        const clusters = [...new Set(data.map(d=>d.cluster))];
+        const traces = clusters.map(c => {
+            const s = data.filter(d=>d.cluster===c);
+            return { type:'scatter3d', mode:'markers', name:`Küme ${c}`,
+                x:s.map(d=>d.fullFare), y:s.map(d=>d.student),
+                z:s.map(d=>zMetric==='Free'?d.free:d.bankCard),
+                text:s.map(d=>d.institution),
+                marker:{size:6, color:colors[c%colors.length]} };
+        });
+        Plotly.newPlot('scatter3d', traces, {scene:{xaxis:{title:'FullFare'},yaxis:{title:'Student'},zaxis:{title:zMetric}}}, {responsive:true});
+    }
+
+    document.getElementById("btnScatter3D").addEventListener("click", async () => {
+        const zMetric=document.getElementById("zMetric").value;
+        const res=await fetch("/api/clusters?k=3");
+        const data=await res.json();
+        lastClusterData=data;
+        render3DScatter(data,zMetric);
+    });
+
+    document.getElementById("zMetric").addEventListener("change",()=> {
+        if(lastClusterData) render3DScatter(lastClusterData, document.getElementById("zMetric").value);
+    });
+
+    // 🧠 Kümeleme
+    document.getElementById("btnCluster").addEventListener("click", async () => {
+        const res = await fetch("/api/clusters?k=3");
+        const data = await res.json();
+        if (!data?.length) return alert("Veri bulunamadı");
+        const labels=data.map(d=>d.institution);
+        const colors=data.map(d=>["#4caf50","#ff9800","#2196f3","#9c27b0","#f44336"][d.cluster%5]);
+        clusterChartObj?.destroy();
+        clusterChartObj=new Chart(document.getElementById("clusterChart"),{
+            type:"bar", data:{labels,datasets:[{label:"Küme ID",data:data.map(d=>d.cluster),backgroundColor:colors,borderRadius:8}]},
+            options:{scales:{y:{beginAtZero:true,stepSize:1}}}});
+    });
+
+    // 🔹 Ana Dashboard
+    async function loadDashboard(inst, from, to) {
+        if(!inst){alert("Lütfen bir kurum adı girin.");return;}
+        document.getElementById("loadingSpinner").style.display="block";
+        const query=`institution=${encodeURIComponent(inst)}${from?`&from=${from}`:""}${to?`&to=${to}`:""}`;
+        const [daily,monthly,forecast,topData]=await Promise.all([
+            fetch(`/api/daily?${query}`).then(r=>r.json()),
+            fetch(`/api/monthly?${query}`).then(r=>r.json()),
+            fetch(`/api/forecast?institution=${inst}`).then(r=>r.json()),
+            fetch(`/api/top?${from?`from=${from}&`:""}${to?`to=${to}`:""}`).then(r=>r.json())
+        ]);
+
+        const dailyLabels=daily.map(x=>x.date.split('T')[0]);
+        const dailyData=daily.map(x=>x.total);
+        const monthlyLabels=monthly.map(x=>`Ay ${x.month}`);
+        const monthlyData=monthly.map(x=>x.total);
+        const forecastLabels=forecast.map(x=>x.date.split('T')[0]);
+        const forecastData=forecast.map(x=>x.forecast);
+        const topLabels=topData.map(x=>x.institution);
+        const topTotals=topData.map(x=>x.total);
+
+        [dailyChartObj,monthlyChartObj,forecastChartObj,topInstitutionsChartObj].forEach(c=>c?.destroy());
+
+        dailyChartObj=new Chart(document.getElementById("dailyChart"),{type:"line",data:{labels:dailyLabels,datasets:[{label:`${inst} Günlük`,data:dailyData,borderColor:"#007cf0"}]}});
+        monthlyChartObj=new Chart(document.getElementById("monthlyChart"),{type:"bar",data:{labels:monthlyLabels,datasets:[{label:`${inst} Aylık`,data:monthlyData,backgroundColor:"#00dfd8"}]}});
+        forecastChartObj=new Chart(document.getElementById("forecastChart"),{type:"line",data:{labels:forecastLabels,datasets:[{label:`${inst} Tahmin`,data:forecastData,borderColor:"#59a14f"}]}});
+        topInstitutionsChartObj=new Chart(document.getElementById("topInstitutionsChart"),{type:"bar",data:{labels:topLabels,datasets:[{label:"Top 5 Kurum",data:topTotals,backgroundColor:["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f"]}]}});
+
+        // 🔁 Top 5 kurum tıklanabilir
+        document.getElementById("topInstitutionsChart").onclick=function(evt){
+            const pts=topInstitutionsChartObj.getElementsAtEventForMode(evt,'nearest',{intersect:true},true);
+            if(pts.length){
+                const lbl=topInstitutionsChartObj.data.labels[pts[0].index];
+                institution.value=lbl;
+                loadDashboard(lbl);
+            }
+        };
+
+        document.getElementById("summaryBox").style.display="block";
+        document.getElementById("summaryText").textContent=`${daily.reduce((s,x)=>s+x.total,0).toLocaleString("tr-TR")} yolcu (${from||"ilk"} → ${to||"son"})`;
+
+        await detectAnomalies(inst);
+        await loadCorrelation(inst,from,to);
+
+        document.getElementById("loadingSpinner").style.display="none";
+    }
+
+    // 📅 Buton ve Enter
+    btnLoad.addEventListener("click",()=>loadDashboard(institution.value.trim(),fromDate.value,toDate.value));
+    institution.addEventListener("keypress",e=>{if(e.key==="Enter")btnLoad.click();});
+    });
+</script>
