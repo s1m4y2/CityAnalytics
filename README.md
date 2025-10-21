@@ -139,7 +139,20 @@ Bu proje açık kaynaklıdır ve araştırma / eğitim amaçlı kullanılabilir.
 
 ---
 
-## 🌟 Ekran Görseli 
-```
-![forecast-example](https://github.com/<kullanici-adin>/CityAnalytics/assets/.../forecast.png)
-```
+## 🖼️ CityAnalytics Dashboard Görselleri
+
+### 1️⃣ Genel Görünüm (Metro)
+<img width="1187" height="785" alt="Dashboard 1" src="https://github.com/user-attachments/assets/2b4f1003-4038-4501-82f0-249ee981914b" />
+
+### 2️⃣ Günlük & Aylık Kullanım
+<img width="1151" height="867" alt="Dashboard 2" src="https://github.com/user-attachments/assets/8f7e2851-a63a-4075-b1bc-d075c5042485" />
+
+### 3️⃣ Tahmin, En Yoğun Kurum, Kümeleme 
+<img width="1213" height="922" alt="Dashboard 3" src="https://github.com/user-attachments/assets/82bc04cc-86e2-4c7a-898f-dea20431dfb0" />
+
+### 4️⃣ Anomaliler ve Korelasyon Isı Haritası
+<img width="1166" height="922" alt="Dashboard 4" src="https://github.com/user-attachments/assets/6dd14ee0-5515-40bb-b1c9-78be3bb55df4" />
+
+> Tüm görseller canlı analizlerden elde edilmiştir.  
+> Veriler SQLite üzerinden okunur, ML.NET ile işlenir ve web arayüzünde dinamik olarak gösterilir.
+
