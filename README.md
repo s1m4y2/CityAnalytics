@@ -121,7 +121,7 @@ var anomalies = await ad.DetectDailyAnomaliesAsync("Metro A.Ş.");
 - Yazılım Mühendisliği, Manisa Celal Bayar Üniversitesi  
 - Alanlar: Backend, Veri Madenciliği, Dağıtık Sistemler  
 - Proje: *CityAnalytics – Akıllı Şehir Ulaşım Analitiği*  
-- 🌐 [LinkedIn](www.linkedin.com/in/simay-ayanoğlu-0b02a8255)  
+- 🌐 [LinkedIn](https://www.linkedin.com/in/simay-ayanoğlu-0b02a8255)  
 - 📧 simaynglu@gmail.com  
 
 ---
